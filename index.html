@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>定时提醒</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+  }
+  .container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  .container h1 {
+    color: #333;
+  }
+  .form-group {
+    margin-top: 20px;
+  }
+  .form-group label {
+    display: block;
+  }
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+  .form-group.inline {
+    display: flex;
+    justify-content: space-between;
+  }
+  .form-group.inline .form-control {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  .form-group.inline .form-control:last-child {
+    margin-right: 0;
+  }
+  button {
+    width: 100%;
+    padding: 10px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #4cae4c;
+  }
+</style>
+</head>
+<body>
+    <h1>定时提醒</h1>
+    <form id="reminder-form">
+        <div class="form-group">
+            <label for="reminder-text">请输入提醒内容：</label>
+            <textarea id="reminder-text" name="reminder-text" rows="4" required oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+        </div>
+        
+        <div class="form-group inline">
+            <div class="form-control">
+                <label for="reminder-date">日期：</label>
+                <input type="date" id="reminder-date" name="reminder-date" required>
+            </div>
+            <div class="form-control">
+                <label for="reminder-time">时间：</label>
+                <input type="time" id="reminder-time" name="reminder-time" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="reminder-email">收件箱：</label>
+            <input type="email" id="reminder-email" name="reminder-email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required title="请输入有效的邮箱地址。">
+        </div>
+        
+        <button type="button" id="save-button">保存</button>
+    </form>
+
+    <script>
+      document.getElementById('save-button').addEventListener('click', function() {
+        var reminderText = document.getElementById('reminder-text').value;
+        var reminderDate = document.getElementById('reminder-date').value;
+        var reminderTime = document.getElementById('reminder-time').value;
+        var reminderEmail = document.getElementById('reminder-email').value;
+
+        // 验证邮箱格式
+        var emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailPattern.test(reminderEmail)) {
+          alert('请输入有效的邮箱地址。');
+          return;
+        }
+
+        // 这里可以添加代码调用微信云函数，下面是伪代码
+        // callWeChatCloudFunction(reminderText, reminderDate, reminderTime, reminderEmail);
+
+        fetch('https://vercel-reminder.vercel.app/api/setReminder', {
+          method: 'POST',
+          body: JSON.stringify({
+            reminderText: reminderText,
+            reminderDate: reminderDate,
+            reminderTime: reminderTime,
+            reminderEmail: reminderEmail
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert(data.message);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          alert('提醒设置失败。');
+        });
+
+
+      });
+
+
+
+      // 禁止表单回车自动提交
+      document.getElementById('reminder-form').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+        }
+      });
+    </script>
+</body>
+</html>
